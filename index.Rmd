@@ -288,7 +288,7 @@ data.frame(Proficio = c("Added Entry (personal name)", "Added Entry (corporate n
 </details>
 
 <details>
-<summary><u>Processed By - Mandatory (Collection level only)</u></summary>
+<summary><u><strong>Processed By</strong> - Mandatory (Collection level only)</u></summary>
 Using the formatted memo interface, record the name of the processing archivist(s) and year in which processing was completed.
 
 </details>
