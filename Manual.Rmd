@@ -1,0 +1,355 @@
+---
+title: "Cataloging Materials in the Proficio Archival Collections Module"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r libraries, echo=F, message=F}
+library(tidyverse)
+library(kableExtra)
+```
+
+
+# Intro: What materials should be cataloged in this module? 
+
+The _Archival Collections_ module is appropriate for all PSNC archival materials, but requires that materials be organized hierarchically into a collection-series-file-item structure. At present, some materials that are part of hierarchically-arranged collections are documented in the _Item Level Archives_ module, but these should be moved into the Archival Collections module. Orphaned items absorbed into the Ephemera `(PSNCA.E.xxx)` and Photograph `(PSNCA.P.xxx)` collections are correctly cataloged in the Item Level Archives module.  
+
+# Overview of the module data structure 
+
+The Archival Collections module divides records into four directories: collection, series, file, and item. These four tiers are the basis for the module’s hierarchical organization, but users are not limited to four hierarchical levels: the series level can be used to document sub-series, while the file level can accommodate boxes, folders, and sub-folders.  
+
+Records are linked across the four directories using ID numbers. The collection at large is identified by a `PSNCA.H.xxx` number. This also serves to identify the collection, itself, as a subcollection of our top-level collection (`PSNCA` - PSNC Archives and Special Collections) and the historical materials sub-collection (`PSNCA.H` - PSNC Historical Materials). An additional numeric field is added for each subsequent hierarchical level.  
+
+# Record numbering 
+
+Proficio utilizes special characters to identify the role of each portion of each record’s ID number. This is easiest to understand through an example: 
+
+**PSNCA.H.049/04.02-08.04#01** – City of Newport Tax Book (1841) 
+```{r example-table, echo=F}
+read.csv("Example_SpecChar.csv") %>% 
+	kbl(col.names = c("Hierarchical Level", "Leading Character", "Example", "Meaning")) %>% 
+	kable_styling() 
+```
+
+
+ 
+
+These record numbers are generated automatically in the course of cataloging materials. In the user interface, the ID number for the current record is viewable at the top of the cataloging screen.  
+
+# The Interface {.tabset}
+
+This section simulates the Proficio cataloging interface. Click through the tabs below to learn which information is input in each section, and how Proficio fields relate to DACS elements. 
+
+## Item Information {.tabset}
+
+This tab contains essential descriptive metadata fields for documenting archival materials. However, some fields may be unnecessary for many materials. The field descriptions provided in the tabs will state if a field is considered **mandatory** for all hierarchical levels, based on Proficio’s operational requirements, DACS, and/or PSNC policies.
+
+### Main Information
+
+<details>
+<summary><u><strong>Collection/Series/File/Item Identifiers</strong> - Mandatory</u> </summary>
+
+These fields generate the record numbers which facilitate linking between hierarchical levels, as described above. Depending on the hierachical level and how a record is initialized, some of these fields may populate automatically. All available number fields **must** be populated for records to link correctly. 
+
+**All ID numbers should include leading zeros.**
+
+When adding items at the file level, Proficio requires that all files be identified via a _container_. The typical `Box, Folder` numbering is indicated using decimal points: `Box.Folder`. For records to properly populate in the hierarchy, boxes must be entered as "File" units with the Category value "Container" or "Box". For example: Box 1, Folder 1 in a collection is entered as `01.01`. Box 1 must **also** be cataloged in the File level, with the container number `01`. Proficio then recognizes Folder 1 as a sub-unit of Box 1. 
+
+```{r numbers-crosswalk, echo=F}
+data.frame(Proficio = c("Collection Nbr", "Series Nbr", "File Nbr", "Item Nbr"),
+		   EAD2002 = c("<eadid>", "<unitid>", "<unitid>", "<unitid>"),
+		   EAD3 = c("<recordid>", "<unitid>", "<unitid>", "<unitid>"),
+		   DACS = c("2.1 Reference Code", "NA", "NA", "NA"),
+		   MARC = c("099", "NA", "NA", "NA")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u><strong>Title</strong> - Mandatory</u></summary>
+
+The title you have assigned to a given unit of material.
+
+```{r title-crosswalk, echo=F}
+data.frame(Proficio = c("Title"),
+		   EAD = c("<title>"),
+		   DACS = c("2.3 Title"),
+		   MARC = c("245$a")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u><strong>Category</strong> - Mandatory (File and Item Level)</u></summary>
+
+This field utilizes a dropdown menu to categorize materials by format. Proficio requires that this field be populated before a record can be saved. This is only for Proficio's internal logistics, and doesn't map directly to standard metadata fields. 
+</details>
+
+<details>
+<summary><u>Dates - Recommended</u></summary>
+
+Dates of production for a given unit. Sometimes, dates are not able to be determined, and in these cases, it is appropriate to leave this field blank. However, whenever possible, dates should be assigned at every hierarchical level.
+
+At Collection and Series level, the date field is separated into _inclusive_ and _bulk_ dates, like in EAD.
+
+```{r dates-crosswalk, echo=F}
+data.frame(Proficio = c("Dates", "Inclusive Dates", "Bulk Dates"),
+		   EAD2002 = c("<unitdate>", "<unitdate type=\"inclusive\">", "<unitdate type=\"bulk\">"),
+		   EAD3 = c("<unitdate>", "<unitdate unitdatetype=\"inclusive\">", "<unitdate unitdatetype=\"bulk\">"),
+		   DACS = c("2.4 Date", "2.4 Date", "2.4 Date"),
+		   MARC = c("245\\$f", "245\\$f", "245\\$g")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u><strong>Location</strong> - Mandatory (Collection level only)</u></summary>
+
+Important to include for internal tracking of materials! Only necessary at collection level, unless some series or files are stored in a very separate location, such as the flat file or a quarantined storage situation. In those cases, use the location element only for those units which are stored separately from the majority of the collection.
+</details>
+
+<details>
+<summary><u><strong>Extent</strong> - Mandatory (Collection level only)</u></summary>
+
+A descriptor for the quantity of materials, either physically or digitally. This field utilizes a _formatted memo_ structure to separate the element into a number and a unit. Proficio is pre-populated with the following units: cubic feet (CF), each (EA), folder, gigabytes (GB), kilobytes (KB), linear feet (LF), and megabytes (MB). 
+```{r extent-crosswalk, echo=F}
+data.frame(Proficio = c("Extent", "Extent - Extent", "Extent - Unit"),
+		   EAD2002 = c("<extent>", NA, NA),
+		   EAD3 = c("<physdescstructured>", "<quantity>", "<unittype>"),
+		   DACS = c("2.5 Extent", "2.5.3: Record the numerical quanity associated with each expression of physical extent", "2.5.4: Record the quantity of material in terms of physical extent as linear or cubic feet, number of items, or number of containers"),
+		   MARC = c("300", "300\\$a", "300\\$f")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u><strong>Creator, Name Type, and Creator Role</strong> - Mandatory, if known (Collection level only)</u></summary>
+
+These three fields collectively identify the creator of the unit, identify what category the name authority record falls within (personal name, corporate body, meeting name, or uniform title), and the entity's role in the creation of the unit or item (author, creator, illustrator, or photographer). For most collections, the relevant creator will be identified with the generalized "creator" role. When using this element at more granular hierarchical levels, the other creator roles may be relevant. 
+
+```{r creator-crosswalk, echo=F}
+data.frame(Proficio = c("Creator", "Name Type", "Creator Role"),
+		   EAD2002 = c("<origination>", "<persname>, <corpname>, <famname>, or <name>", "<origination \\@label>"),
+		   EAD3 = c("<origination>", "<persname>, <corpname>, <famname>, or <name>", "@relator attribute within name elements"),
+		   DACS = c("2.6 Name of Creator(s)", "2.6 Name of Creator(s)", "2.6 Name of Creator(s)"),
+		   MARC = c("100, 110, or 111", "Subfield $l in whichever field is relevant based on name type", NA)
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Summary (Abstract) - Optional</u></summary>
+
+This field is designed to hold an abstract for the materials described. It is a formatted memo field: when you click into the field, it will open a window with four subfields. The first subfield (Note) is where you will write the abstract. Ignore the next two subfields (Expansion and URI). In the final dropdown, select "Abstract". 
+</details>
+
+<details>
+<summary><u><strong>Bio/Org History</strong> - Mandatory (Collection level only)</u></summary>
+
+Use the Biographical or Organizational History note that you would like to appear in the final finding aid. This is also a formatted memo field; use the appropriate "note" field (biographical or administrative history) according to the content of the note. If your note is multiple paragraphs, separate them with a blank line. Do not include `<p>` tags -- you will need to manually add these when converting to an EAD finding aid.
+
+```{r bioghist-crosswalk, echo=F}
+data.frame(Proficio = c("Bio/Org History"),
+		   EAD2002 = c("<bioghist>"),
+		   EAD3 = c("<bioghist>"),
+		   DACS = c("2.7 Administrative/Biographical History"),
+		   MARC = c("545")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u><strong>Scope-Content</strong> - Mandatory (Collection level only)</u></summary>
+
+Like biographical or historical notes, use the same Scope/Content note that you plan to include in your finding aid. This is also a formatted memo, and the "note" field is the place to put your text. Ignore the expanion and URI fields. 
+
+```{r scopecontent-crosswalk, echo=F}
+data.frame(Proficio = c("Scope-Content"),
+		   EAD2002 = c("<scopecontent>"),
+		   EAD3 = c("<scopecontent>"),
+		   DACS = c("3.1 Scope and Content"),
+		   MARC = c("520")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Organization/Arrangement - Recommended (Collection level only)</u></summary>
+
+This field utilizes a formatted memo, and it is important to put the appropriate information into each subfield in order to correctly populate the exported finding aid.
+
+1. Organization: The manner in which the described materials are subdivided, and the pattern according to which they are arranged. (Example: "Organized into three series by format: Series 1: Photographs, Series 2: Financial Records, Series 3: Ephemera.")
+2. Arrangement: Use for any details about the process of "accessioning, arranging, describing, preserving, storing, or otherwise preparing the described materials for research use," (EADiva), including previously used systems of arrangement. 
+3. Separated materials: Document any materials which have a direct and significant connection to those being described which are held by **other repositories** or private collectors. 
+
+```{r orgarrange-crosswalk, echo=F}
+data.frame(Proficio = c("Organization", "Arrangement", "Separated materials"),
+		   EAD2002 = c("<arrangement>", "<processinfo>", "<separatedmaterial>"),
+		   EAD3 = c("<arrangement>", "<processinfo>", "<separatedmaterial>"),
+		   DACS = c("3.2 System of Arrangement", "7.1.8: Processing Information in Notes", "6.3 Related Archival Materials"),
+		   MARC = c("351\\$a", "583", "544\\$n")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Provenance - Recommended (Collection level only)</u></summary>
+
+This field provides space to describe the collection's ownership and stewardship prior to its acquisition by the Preservation Society, as well as the conditions of its acquisition. It is strongly recommended to include this element at collection level.
+
+```{r provenance-crosswalk, echo=F}
+data.frame(Proficio = c("Provenance"),
+		   EAD2002 = c("<acqinfo>"),
+		   EAD3 = c("<acqinfo>"),
+		   DACS = c("5.1 Custodial History and 5.2 Immediate Source of Acquisition"),
+		   MARC = c("561$a")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Associated Materials - Optional</u></summary>
+
+Use this field to identify other archival materials, held by the PSNC or other repositories, which may be of interest to researchers using the described materials. For materials with shared provenance which are held elsewhere, use the _Separated Materials_ subfield under the Organization/Arrangement formatted memo element.
+
+The Associated Materials field uses a _repeated formatted memo_. Use the first column, _Title_, to record the name of any related collections, and the _Custodian_ column to record the name of the repository holding the collection. If the relationship is only to a specific series, folder, or item, document that in the _Matls Specified_ column. Ignore the _Provenance_ and _Address_ columns. Use the _Relationship_ field for notes on the nature of the relationship between the materials, and reserve the general _Notes_ field for any additional notes.
+
+Because Proficio does not have a dedicated field for duplicated materials, use this field to document the location of originals if the described collection contains duplicates. If the associated materials are duplicates, indicate that they are duplicates in the _Relationship_ column of the repeated formatted memo interface. 
+
+```{r assocmaterials-crosswalk, echo=F}
+data.frame(Proficio = c("Assoc Materials", "Assoc Materials"),
+		   EAD2002 = c("<relatedmaterial>", "<originalsloc>"),
+		   EAD3 = c("<relatedmaterial>", "<originalsloc>"),
+		   DACS = c("6.3 Related Archival Materials", "6.1 Existence and Location of Originals"),
+		   MARC = c("561$a", "535")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Finding Aids- Recommended (Collection level only)</u></summary>
+
+This repeated formatted memo field allows you to record the URI if the collection has a finding aid hosted elsewhere, such as RIAMCO. Use the _URI_ column of the repeated formatted memo table to record the URI. Ignore the other columns, unless a _Note_ is absolutely necessary. 
+</details>
+
+<details>
+<summary><u>Notes - Optional</u></summary>
+
+As in other metadata formats, this optional notes field can be used to record information which does not fit more appropriately elsewhere.
+
+```{r notes-crosswalk, echo=F}
+data.frame(Proficio = c("Notes"),
+		   EAD2002 = c("<note>"),
+		   EAD3 = c("<controlnote>, <descriptivenote>, or <didnote>"),
+		   DACS = c("7.1 Notes"),
+		   MARC = c("500")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Added Entry - Optional</u></summary>
+A repeated formatted memo which can be used to record additional entities responsible for the creation of the materials. The _Added Entry_ column accepts personal, corporate, or meeting names. 
+
+```{r addentry-crosswalk, echo=F}
+data.frame(Proficio = c("Added Entry (personal name)", "Added Entry (corporate name)", "Added Entry (meeting name)"),
+		   EAD2002 = c("<persname> under <origination>", "<corpname> under <origination>", "<name> under <origination>"),
+		   EAD3 = c("<persname> under <origination>", "<corpname> under <origination>", "<name> under <origination>"),
+		   DACS = c("2.6 Name of Creator(s)", "2.6 Name of Creator(s)", "2.6 Name of Creator(s)"),
+		   MARC = c("700", "710", "711")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+</details>
+
+<details>
+<summary><u>Processed By - Mandatory (Collection level only)</u></summary>
+Using the formatted memo interface, record the name of the processing archivist(s) and year in which processing was completed.
+
+</details>
+
+<details>
+<summary><u><strong>Language</strong> - Mandatory (Collection level and language materials only)</u></summary>
+
+The _Language_ field serves double duty. At the collection level, use this field to record the language in which descriptions are written. At lower hierarchical levels, use the same field to describe the language used in language materials. 
+
+The field uses a formatted memo. Use the dropdown menu to populate the _Language Code_ field appropriately. Use the _Language Note_ field if necessary to record contextual information. 
+
+```{r language-crosswalk, echo=F}
+data.frame(Proficio = c("Language (collection level)", "Language (file/item level"),
+		   EAD2002 = c("<language> under <langusage>", "<language> under <langmaterial>"),
+		   EAD3 = c("<language> under <langdeclaration>", "<language> under <langmaterial>"),
+		   DACS = c("NA", "4.5 Languages and Scripts of the Material"),
+		   MARC = c("NA", "041$a")
+		   ) %>% 
+	kable() %>% 
+	kable_styling() 
+```
+
+</details>
+
+<details>
+<summary><u>Record Status - Recommended (Collection level only)</u></summary>
+
+This field is used to declare the status of the catalog record, itself. The dropdown uses the following options:
+
+- COMPLETE: Processing _and description_ completed.
+- DRAFT RECORD: Required fields not completed. Use when the record has been initialized, but you have not entered information in all mandatory fields.
+- INCOMPLETE: Further processing required. Use when you have entered information in all mandatory fields, but you intend to revise the record.
+- OBJECT FILE CREATED: **Not relevant to archival material. Do not use.**
+- PENDING REVIEW: Use only if you have completed the record
+
+</details>
+
+<details>
+<summary><u>Item Status - Recommended if items are removed from storage for an extended duration</u></summary>
+
+If an item from the described collection is used in an exhibit, is sent out for conservation, or is otherwise out of storage for an extended period, change this field to reflect the change in status. By default, set this field to "STORAGE".
+</details>
+
+<details>
+<summary><u><strong>Web Ready?</strong> - Mandatory (Collection level only)</u></summary>
+
+Use this Yes/No dropdown field to send web-ready records to the public-facing Proficio for the Web site. Check with Genna before you mark anything web-ready!
+</details>
+
+### Subject Access 
+
+### Extended Information 
+
+### MARC Information 
+
+## Supplemental Information
+
+## Images
+
+## Multimedia
+
+## Hierarchial Parents
+
+## Associations
