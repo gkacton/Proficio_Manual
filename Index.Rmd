@@ -51,7 +51,7 @@ This tab contains essential descriptive metadata fields for documenting archival
 <details>
 <summary><u><strong>Collection/Series/File/Item Identifiers</strong> - Mandatory</u> </summary>
 
-These fields generate the record numbers which facilitate linking between hierarchical levels, as described above. Depending on the hierachical level and how a record is initialized, some of these fields may populate automatically. All available number fields **must** be populated for records to link correctly. 
+These fields generate the record numbers which facilitate linking between hierarchical levels, as described above. Depending on the hierarchical level and how a record is initialized, some of these fields may populate automatically. All available number fields **must** be populated for records to link correctly.  
 
 **All ID numbers should include leading zeros.**
 
